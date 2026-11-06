@@ -1,0 +1,45 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'moe.erroro.wecomnowatermark'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "moe.erroro.wecomnowatermark"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildFeatures {
+        // Toast 里要显示版本号 / 判断是否调试版，需要 BuildConfig
+        buildConfig true
+    }
+
+    buildTypes {
+        release {
+            // 用 AGP 自动生成的 debug 签名，保证 Release 产物可直接安装。
+            // 想用自己的 keystore 就删掉这行，改成 signingConfigs.release。
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    packaging {
+        resources.excludes += ['META-INF/*']
+    }
+}
+
+dependencies {
+    // Xposed API 只在编译期需要，运行期由宿主框架提供
+    compileOnly 'de.robv.android.xposed:api:82'
+}

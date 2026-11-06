@@ -1,0 +1,30 @@
+// ---------------------------------------------------------------------------
+// 插件仓库：AGP 只发布在 Google Maven，必须显式声明 pluginManagement，
+// 否则 Gradle 只会去 plugins.gradle.org 找，报 "Plugin ... was not found"。
+// 官方仓库优先（CI 更快），阿里云镜像作为国内网络的兜底。
+// ---------------------------------------------------------------------------
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+        // Xposed API（compileOnly）
+        maven { url 'https://api.xposed.info/' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+    }
+}
+
+rootProject.name = "WeComNoWatermark"
+include ':app'

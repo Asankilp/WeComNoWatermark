@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="false"
+        android:label="@string/app_name"
+        android:supportsRtl="true">
+
+        <!-- 声明这是一个 Xposed 模块 -->
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+
+        <!-- 模块简介（LSPosed 模块列表里显示） -->
+        <meta-data
+            android:name="xposeddescription"
+            android:value="@string/module_desc" />
+
+        <!-- 最低框架版本 -->
+        <meta-data
+            android:name="xposedminversion"
+            android:value="93" />
+
+        <!-- 建议作用域（部分管理器会读取） -->
+        <meta-data
+            android:name="xposedscope"
+            android:resource="@array/xposedscope" />
+    </application>
+
+</manifest>
