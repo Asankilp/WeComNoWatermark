@@ -29,13 +29,20 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      # 注意：setup-android 的 packages 默认值是 'tools platform-tools'，
+      # 而 'tools' 已从 SDK 仓库移除，会直接报 Failed to find package 'tools'。
+      # 这里显式覆盖，只装项目真正需要的包（空格分隔）。
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
+          accept-android-sdk-licenses: true
 
-      - name: Install SDK packages
+      - name: Verify SDK packages
         run: |
-          yes | sdkmanager --licenses > /dev/null 2>&1 || true
-          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          ls "$ANDROID_SDK_ROOT/platforms"
+          ls "$ANDROID_SDK_ROOT/build-tools"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -43,20 +50,45 @@ jobs:
           gradle-version: '8.7'
 
       # ---------------- 普通提交：构建 debug ----------------
+
+      # 每次 CI 调试构建分配一套随机版本号，方便在模块列表 / 安装器里区分不同产物。
+      # versionCode 上限是 2100000000，这里取 1000000 ~ 2000000000 之间的随机值。
+      - name: Generate debug version
+        if: github.event_name != 'release'
+        run: |
+          CODE=$(shuf -i 1000000-2000000000 -n 1)
+          NAME="1.0.${CODE}"
+          echo "VERSION_CODE=$CODE" >> "$GITHUB_ENV"
+          echo "VERSION_NAME=$NAME" >> "$GITHUB_ENV"
+          echo "本次调试构建版本号: versionName=$NAME versionCode=$CODE"
+
       - name: Build debug APK
         if: github.event_name != 'release'
-        run: gradle assembleDebug --no-daemon --stacktrace
+        run: |
+          gradle assembleDebug \
+            -PappVersionCode="$VERSION_CODE" \
+            -PappVersionName="$VERSION_NAME" \
+            --no-daemon --stacktrace
+
+      - name: Rename debug APK
+        if: github.event_name != 'release'
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk \
+             "dist/WeComNoWatermark-debug-${VERSION_NAME}.apk"
+          ls -l dist
 
       - name: Upload debug APK
         if: github.event_name != 'release'
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: app/build/outputs/apk/debug/*.apk
+          path: dist/*.apk
           if-no-files-found: error
           retention-days: 30
 
       # ---------------- 发布 Release：构建 release 并上传 ----------------
+
       - name: Build release APK
         if: github.event_name == 'release'
         run: gradle assembleRelease --no-daemon --stacktrace

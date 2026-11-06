@@ -1,6 +1,6 @@
 # 企业微信去水印
 
-[![Build](https://github.com/OWNER/REPO/actions/workflows/build.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/build.yml)
+[![Build](https://github.com/Asankilp/WeComNoWatermark/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/Asankilp/WeComNoWatermark/actions/workflows/build.yml)
 
 一个 Xposed 模块，用于移除企业微信（WeCom）**聊天界面**与**通讯录**上的水印，
 并同时屏蔽日历、邮件、文件预览等页面的全屏水印。
